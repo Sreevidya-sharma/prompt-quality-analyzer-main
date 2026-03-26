@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="api-base" content="" />
+  <title>Prompt Cognitive Health Dashboard</title>
+  <link rel="icon" type="image/png" href="/static/logo.png?v=1">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --card: #1a2332;
+      --muted: #9aa8bc;
+      --text: #e8eef5;
+      --accent: #3d8bfd;
+      --accept: #00ff88;
+      --reject: #ff4d4d;
+      --review: #ffaa00;
+      --radius: 12px;
+      --header-h: 56px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      font-size: 15px;
+      background: linear-gradient(160deg, #0f1419 0%, #151d2a 50%, #0f1419 100%);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      padding: 0 1.25rem;
+      height: var(--header-h);
+      background: rgba(26, 35, 50, 0.92);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(10px);
+    }
+    .topbar img {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      object-fit: contain;
+      background: rgba(255,255,255,0.06);
+    }
+    .topbar h1 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 1.5rem 1.25rem 3rem;
+    }
+    .sub {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.5;
+      margin: 0.5rem 0 0;
+    }
+    .sub code { font-size: 0.85em; color: var(--accent); }
+    .status {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 0.75rem;
+    }
+    .status.err { color: #f87171; }
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: flex-end;
+      margin: 1.25rem 0 1.5rem;
+      padding: 1rem 1.15rem;
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+    .filter-group label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .filters select {
+      background: rgba(0,0,0,0.25);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      padding: 0.45rem 0.65rem;
+      font-size: 0.9rem;
+      min-width: 140px;
+    }
+    .grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    }
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 1rem 1.15rem;
+      border: 1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+      min-height: 104px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+    .card.card-accent { border-left: 4px solid var(--accent-border, rgba(255,255,255,0.15)); }
+    .card.card-accent.accept { --accent-border: var(--accept); }
+    .card.card-accent.reject { --accent-border: var(--reject); }
+    .card.card-accent.review { --accent-border: var(--review); }
+    .card h2 {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin: 0 0 0.5rem;
+      font-weight: 600;
+    }
+    .card .val {
+      font-size: 1.45rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.2;
+      color: var(--val-color, var(--text));
+    }
+    .card.card-accent.accept .val { --val-color: var(--accept); }
+    .card.card-accent.reject .val { --val-color: var(--reject); }
+    .card.card-accent.review .val { --val-color: var(--review); }
+    .card .unit {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 500;
+      margin-top: auto;
+      padding-top: 0.35rem;
+    }
+    .section-block { margin-top: 2rem; }
+    .section-block h2 {
+      font-size: 1.02rem;
+      font-weight: 600;
+      margin: 0 0 1rem;
+      letter-spacing: -0.01em;
+    }
+    .chart-grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 900px) {
+      .chart-grid.two { grid-template-columns: 1fr 1fr; }
+    }
+    .chart-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 1rem 1rem 0.5rem;
+      border: 1px solid rgba(255,255,255,0.06);
+      position: relative;
+      height: 280px;
+    }
+    .chart-card.wide { grid-column: 1 / -1; height: 300px; }
+    .chart-card h3 {
+      margin: 0 0 0.5rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .chart-wrap { position: relative; height: calc(100% - 1.75rem); }
+    .bars {
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+    .bar-row {
+      display: grid;
+      grid-template-columns: 88px 1fr minmax(120px, auto);
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.9rem;
+    }
+    .bar-label { font-weight: 600; }
+    .bar-label.accept { color: var(--accept); }
+    .bar-label.reject { color: var(--reject); }
+    .bar-label.review { color: var(--review); }
+    .bar-track {
+      height: 22px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      transition: width 0.35s ease;
+    }
+    .bar-fill.accept { background: var(--accept); box-shadow: 0 0 12px rgba(0, 255, 136, 0.35); }
+    .bar-fill.reject { background: var(--reject); box-shadow: 0 0 12px rgba(255, 77, 77, 0.35); }
+    .bar-fill.review { background: var(--review); box-shadow: 0 0 12px rgba(255, 170, 0, 0.35); }
+    .bar-pct {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .reasons {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .reasons li {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
+      padding: 0.7rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-size: 0.93rem;
+    }
+    .reasons li:last-child { border-bottom: none; }
+    .reason-text {
+      flex: 1;
+      word-break: break-word;
+      color: var(--text);
+    }
+    .reason-count {
+      color: var(--accent);
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+    .top-mistake {
+      display: grid;
+      gap: 0.4rem;
+    }
+    .top-mistake-title {
+      color: var(--muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+    }
+    .top-mistake-value {
+      color: var(--text);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+    .top-mistake-count {
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+      font-size: 0.85rem;
+    }
+    .empty-hint { color: var(--muted); font-size: 0.9rem; }
+    .recent-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .recent-list li {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 0.65rem 0.85rem;
+      align-items: start;
+      padding: 0.85rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .recent-list li:last-child { border-bottom: none; }
+    .recent-prompt {
+      grid-column: 1 / -1;
+      color: var(--text);
+      font-size: 0.93rem;
+      line-height: 1.5;
+    }
+    .recent-sub {
+      grid-column: 1 / -1;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+    @media (min-width: 640px) {
+      .recent-list li {
+        grid-template-columns: 1fr auto auto;
+      }
+      .recent-prompt { grid-column: 1; }
+    }
+    .recent-meta {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    .decision-badge {
+      flex-shrink: 0;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.55rem;
+      border-radius: 6px;
+      line-height: 1.2;
+      justify-self: end;
+    }
+    .decision-badge.accept {
+      background: rgba(0, 255, 136, 0.18);
+      color: var(--accept);
+      border: 1px solid rgba(0, 255, 136, 0.45);
+    }
+    .decision-badge.reject {
+      background: rgba(255, 77, 77, 0.18);
+      color: var(--reject);
+      border: 1px solid rgba(255, 77, 77, 0.45);
+    }
+    .decision-badge.review {
+      background: rgba(255, 170, 0, 0.18);
+      color: var(--review);
+      border: 1px solid rgba(255, 170, 0, 0.45);
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <img src="/static/logo.png">
+    <h1>Prompt Cognitive Health Dashboard</h1>
+  </header>
+  <div class="wrap">
+    <p class="sub">Live data from <code>GET /stats</code> and <code>GET /recent</code> · refresh every 5s</p>
+    <p class="status" id="status">Loading…</p>
+
+    <div class="filters">
+      <div class="filter-group">
+        <label for="f-range">Time range</label>
+        <select id="f-range" aria-label="Time range">
+          <option value="1h">Last 1 hour</option>
+          <option value="24h">Last 24 hours</option>
+          <option value="7d">Last 7 days</option>
+          <option value="all" selected>All time</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="f-decision">Decision</label>
+        <select id="f-decision" aria-label="Decision type">
+          <option value="all" selected>All</option>
+          <option value="accept">Accept</option>
+          <option value="reject">Reject</option>
+          <option value="review">Review</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grid" id="summary"></div>
+
+    <section class="section-block">
+      <h2>Decisions (share of total)</h2>
+      <div class="card">
+        <div class="bars" id="bars"></div>
+      </div>
+    </section>
+
+    <section class="section-block">
+      <h2>Trends</h2>
+      <div class="chart-grid two">
+        <div class="chart-card">
+          <h3>ED over time</h3>
+          <div class="chart-wrap"><canvas id="chart-ed"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>SQ over time</h3>
+          <div class="chart-wrap"><canvas id="chart-sq"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>Improvement over time</h3>
+          <div class="chart-wrap"><canvas id="chart-improve"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>Score trend (avg per day)</h3>
+          <div class="chart-wrap"><canvas id="chart-score-day"></canvas></div>
+        </div>
+        <div class="chart-card wide">
+          <h3>Decision distribution over time</h3>
+          <div class="chart-wrap"><canvas id="chart-decisions"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-block">
+      <h2>Top reasons</h2>
+      <div class="card">
+        <ul class="reasons" id="reasons"></ul>
+        <p class="empty-hint" id="reasons-empty" hidden>Start typing prompts to see insights.</p>
+      </div>
+    </section>
+
+    <section class="section-block">
+      <h2>Top mistakes</h2>
+      <div class="card">
+        <div class="top-mistake">
+          <div class="top-mistake-title">Most common reason</div>
+          <div class="top-mistake-value" id="top-mistake-value">—</div>
+          <div class="top-mistake-count" id="top-mistake-count"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-block">
+      <h2>Recent prompts</h2>
+      <div class="card">
+        <ul class="recent-list" id="recent-list"></ul>
+        <p class="empty-hint" id="recent-empty" hidden>Start typing prompts to see insights.</p>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const MAX_PROMPT_LEN = 140;
+    const BASE_URL = "https://prompt-quality-analyzer.onrender.com";
+    function getUserIdFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("user_id") || "anonymous";
+    }
+    if (!localStorage.getItem("userId")) {
+      localStorage.setItem("userId", "user_" + crypto.randomUUID())
+    }
+
+    const USER_ID = localStorage.getItem("userId")
+    const CHART_COLORS = {
+      ed: "rgb(61, 139, 253)",
+      sq: "rgb(0, 200, 180)",
+      accept: "rgb(0, 255, 136)",
+      reject: "rgb(255, 77, 77)",
+      review: "rgb(255, 170, 0)",
+    };
+
+    function qsParams() {
+      const range = document.getElementById("f-range").value || "all";
+      const decision = document.getElementById("f-decision").value || "all";
+      return new URLSearchParams({ range, decision });
+    }
+
+    function statsUrl(userId) {
+      const p = qsParams();
+      p.set("user_id", userId);
+      return BASE_URL + "/stats?" + p.toString();
+    }
+
+    function recentUrl(userId) {
+      const p = qsParams();
+      p.set("limit", "20");
+      p.set("user_id", userId);
+      return BASE_URL + "/recent?" + p.toString();
+    }
+
+    let chartEd = null;
+    let chartSq = null;
+    let chartDec = null;
+    let chartImprove = null;
+    let chartScoreDay = null;
+
+    function pct(n) {
+      return (n * 100).toFixed(1) + "%";
+    }
+
+    function topReasons(common, n) {
+      return Object.entries(common || {})
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, n);
+    }
+
+    function truncatePrompt(text) {
+      const s = String(text || "");
+      if (s.length <= MAX_PROMPT_LEN) return s;
+      return s.slice(0, MAX_PROMPT_LEN).trim() + "…";
+    }
+
+    function fmtNum(x, d) {
+      if (x === null || x === undefined || Number.isNaN(Number(x))) return "—";
+      return Number(x).toFixed(d);
+    }
+
+    function renderSummary(s) {
+      const el = document.getElementById("summary");
+      const cards = [
+        { title: "Total prompts", val: s.total_runs, sub: "runs in filter", accent: "" },
+        { title: "Accept", val: s.accept_count, sub: pct(s.accept_rate), accent: "accept" },
+        { title: "Reject", val: s.reject_count, sub: pct(s.reject_rate), accent: "reject" },
+        { title: "Review", val: s.review_count, sub: pct(s.review_rate), accent: "review" },
+        { title: "Avg ED", val: s.avg_ed.toFixed(4), sub: "Engagement", accent: "" },
+        { title: "Avg SQ", val: s.avg_sq.toFixed(4), sub: "Semantic quality", accent: "" },
+        { title: "Avg Clarity", val: fmtNum(s.avg_clarity, 4), sub: "Prompt clarity", accent: "" },
+        { title: "Avg Structure", val: fmtNum(s.avg_structure, 4), sub: "Prompt structure", accent: "" },
+        { title: "Avg Actionability", val: fmtNum(s.avg_actionability, 4), sub: "Prompt actionability", accent: "" },
+      ];
+      el.innerHTML = cards.map((c) => {
+        const extra = c.accent ? ` card-accent ${c.accent}` : "";
+        return `
+        <div class="card${extra}">
+          <h2>${c.title}</h2>
+          <div class="val">${c.val}</div>
+          <div class="unit">${c.sub}</div>
+        </div>`;
+      }).join("");
+    }
+
+    function renderTopMistake(s) {
+      const valueEl = document.getElementById("top-mistake-value");
+      const countEl = document.getElementById("top-mistake-count");
+      const reason = String(s.most_common_reason || "").trim();
+      const count = (s.common_reasons && reason && s.common_reasons[reason]) ? s.common_reasons[reason] : 0;
+      if (!reason) {
+        valueEl.textContent = "Start typing prompts to see insights.";
+        countEl.textContent = "";
+        return;
+      }
+      valueEl.textContent = reason;
+      countEl.textContent = `${count} occurrence${count === 1 ? "" : "s"}`;
+    }
+
+    function renderBars(s) {
+      const max = Math.max(s.accept_count, s.reject_count, s.review_count, 1);
+      const rows = [
+        { label: "Accept", count: s.accept_count, rate: s.accept_rate, cls: "accept" },
+        { label: "Reject", count: s.reject_count, rate: s.reject_rate, cls: "reject" },
+        { label: "Review", count: s.review_count, rate: s.review_rate, cls: "review" },
+      ];
+      document.getElementById("bars").innerHTML = rows.map((r) => {
+        const w = (r.count / max) * 100;
+        return `
+          <div class="bar-row">
+            <span class="bar-label ${r.cls}">${r.label}</span>
+            <div class="bar-track">
+              <div class="bar-fill ${r.cls}" style="width:${w}%"></div>
+            </div>
+            <span class="bar-pct">${r.count} · ${pct(r.rate)}</span>
+          </div>`;
+      }).join("");
+    }
+
+    function renderReasons(s) {
+      const ul = document.getElementById("reasons");
+      const empty = document.getElementById("reasons-empty");
+      const top = topReasons(s.common_reasons, 8);
+      if (top.length === 0) {
+        ul.innerHTML = "";
+        empty.hidden = false;
+        return;
+      }
+      empty.hidden = true;
+      ul.innerHTML = top.map(
+        ([text, count]) =>
+          `<li><span class="reason-text">${escapeHtml(text)}</span><span class="reason-count">${count}</span></li>`
+      ).join("");
+    }
+
+    function renderRecent(items) {
+      const ul = document.getElementById("recent-list");
+      const empty = document.getElementById("recent-empty");
+      const list = Array.isArray(items) ? items : [];
+      if (list.length === 0) {
+        ul.innerHTML = "";
+        empty.hidden = false;
+        return;
+      }
+      empty.hidden = true;
+      ul.innerHTML = list.map((row) => {
+        const d = String(row.decision || "").toLowerCase();
+        const cls = d === "accept" || d === "reject" || d === "review" ? d : "reject";
+        const label = cls.toUpperCase();
+        const reason = escapeHtml(String(row.reason || ""));
+        const suggestion = escapeHtml(truncatePrompt(String(row.suggestion || "")));
+        return `<li>
+          <span class="recent-prompt">${escapeHtml(truncatePrompt(row.prompt))}</span>
+          <span class="recent-meta">Score ${fmtNum(row.score, 2)} · ED ${fmtNum(row.ed_score, 2)} · SQ ${fmtNum(row.sq_score, 2)}</span>
+          <span class="recent-meta">${reason || "No reason recorded"}</span>
+          <span class="recent-sub">${suggestion || "No suggestion recorded"}</span>
+          <span class="decision-badge ${cls}">${label}</span>
+        </li>`;
+      }).join("");
+    }
+
+    function escapeHtml(str) {
+      const d = document.createElement("div");
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
+    function lineChartOptions() {
+      return {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: "index", intersect: false },
+        plugins: {
+          legend: { display: false },
+        },
+        scales: {
+          x: {
+            ticks: { maxTicksLimit: 8, color: "#9aa8bc" },
+            grid: { color: "rgba(255,255,255,0.06)" },
+          },
+          y: {
+            min: 0,
+            max: 1,
+            ticks: { color: "#9aa8bc" },
+            grid: { color: "rgba(255,255,255,0.06)" },
+          },
+        },
+      };
+    }
+
+    function updateCharts(s) {
+      const series = Array.isArray(s.ed_sq_series) ? s.ed_sq_series : [];
+      const labels = series.map((p) => p.t || "");
+      const edData = series.map((p) => p.ed);
+      const sqData = series.map((p) => p.sq);
+
+      const ctxEd = document.getElementById("chart-ed");
+      if (chartEd) chartEd.destroy();
+      chartEd = new Chart(ctxEd, {
+        type: "line",
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "ED",
+              data: edData,
+              borderColor: CHART_COLORS.ed,
+              backgroundColor: "rgba(61, 139, 253, 0.12)",
+              tension: 0.2,
+              fill: true,
+              pointRadius: 2,
+            },
+          ],
+        },
+        options: lineChartOptions(),
+      });
+
+      const ctxSq = document.getElementById("chart-sq");
+      if (chartSq) chartSq.destroy();
+      chartSq = new Chart(ctxSq, {
+        type: "line",
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "SQ",
+              data: sqData,
+              borderColor: CHART_COLORS.sq,
+              backgroundColor: "rgba(0, 200, 180, 0.1)",
+              tension: 0.2,
+              fill: true,
+              pointRadius: 2,
+            },
+          ],
+        },
+        options: lineChartOptions(),
+      });
+
+      const buckets = Array.isArray(s.decision_time_buckets) ? s.decision_time_buckets : [];
+      const bl = buckets.map((b) => b.label || "");
+      const ctx2 = document.getElementById("chart-decisions");
+      if (chartDec) chartDec.destroy();
+      chartDec = new Chart(ctx2, {
+        type: "bar",
+        data: {
+          labels: bl,
+          datasets: [
+            {
+              label: "Accept",
+              data: buckets.map((b) => b.accept || 0),
+              backgroundColor: CHART_COLORS.accept,
+              stack: "s",
+            },
+            {
+              label: "Reject",
+              data: buckets.map((b) => b.reject || 0),
+              backgroundColor: CHART_COLORS.reject,
+              stack: "s",
+            },
+            {
+              label: "Review",
+              data: buckets.map((b) => b.review || 0),
+              backgroundColor: CHART_COLORS.review,
+              stack: "s",
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: "#9aa8bc" } },
+          },
+          scales: {
+            x: {
+              stacked: true,
+              ticks: { maxTicksLimit: 12, color: "#9aa8bc" },
+              grid: { display: false },
+            },
+            y: {
+              stacked: true,
+              beginAtZero: true,
+              ticks: { color: "#9aa8bc" },
+              grid: { color: "rgba(255,255,255,0.06)" },
+            },
+          },
+        },
+      });
+
+      // Improvement over time (delta from first observed score)
+      const scoreSeries = series.map((p) => ((Number(p.ed) + Number(p.sq)) / 2));
+      const baseline = scoreSeries.length > 0 ? scoreSeries[0] : 0;
+      const improveData = scoreSeries.map((v) => Number(v) - baseline);
+      const ctxImprove = document.getElementById("chart-improve");
+      if (chartImprove) chartImprove.destroy();
+      chartImprove = new Chart(ctxImprove, {
+        type: "line",
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "Improvement",
+              data: improveData,
+              borderColor: "rgb(148, 163, 184)",
+              backgroundColor: "rgba(148, 163, 184, 0.14)",
+              tension: 0.2,
+              fill: true,
+              pointRadius: 2,
+            },
+          ],
+        },
+        options: {
+          ...lineChartOptions(),
+          scales: {
+            ...lineChartOptions().scales,
+            y: {
+              ticks: { color: "#9aa8bc" },
+              grid: { color: "rgba(255,255,255,0.06)" },
+            },
+          },
+        },
+      });
+
+      // Average score per day
+      const perDay = {};
+      series.forEach((p) => {
+        const day = String(p.t || "").slice(0, 10);
+        if (!day) return;
+        const score = (Number(p.ed) + Number(p.sq)) / 2;
+        if (!perDay[day]) perDay[day] = { sum: 0, n: 0 };
+        perDay[day].sum += score;
+        perDay[day].n += 1;
+      });
+      const dayLabels = Object.keys(perDay).sort();
+      const dayScores = dayLabels.map((d) => perDay[d].sum / Math.max(perDay[d].n, 1));
+      const ctxScoreDay = document.getElementById("chart-score-day");
+      if (chartScoreDay) chartScoreDay.destroy();
+      chartScoreDay = new Chart(ctxScoreDay, {
+        type: "line",
+        data: {
+          labels: dayLabels,
+          datasets: [
+            {
+              label: "Avg score/day",
+              data: dayScores,
+              borderColor: "rgb(99, 102, 241)",
+              backgroundColor: "rgba(99, 102, 241, 0.14)",
+              tension: 0.2,
+              fill: true,
+              pointRadius: 2,
+            },
+          ],
+        },
+        options: lineChartOptions(),
+      });
+    }
+
+    async function loadDashboard() {
+      const status = document.getElementById("status");
+      const userId = getUserIdFromURL();
+      const statsEndpoint = statsUrl(userId);
+      const recentEndpoint = recentUrl(userId);
+      status.textContent = "Loading dashboard...";
+      status.classList.remove("err");
+      try {
+        console.log("Dashboard fetching:", { statsEndpoint, recentEndpoint });
+        const [statsRes, recentRes] = await Promise.all([
+        fetch(statsEndpoint, {
+           headers: {
+            "x-user-id": userId
+          }
+        }),
+        fetch(recentEndpoint, {
+          headers: {
+            "x-user-id": userId
+          }
+        }),
+      ]);
+        const statsText = await statsRes.text();
+        const recentText = await recentRes.text();
+        const s = statsText ? JSON.parse(statsText) : {};
+        const recent = recentText ? JSON.parse(recentText) : [];
+        console.log("Dashboard stats response:", { status: statsRes.status, ok: statsRes.ok, data: s });
+        console.log("Dashboard recent response:", { status: recentRes.status, ok: recentRes.ok, data: recent });
+        if (!statsRes.ok) throw new Error("stats HTTP " + statsRes.status);
+        renderSummary(s);
+        renderBars(s);
+        renderReasons(s);
+        renderTopMistake(s);
+        updateCharts(s);
+        if (recentRes.ok) {
+          renderRecent(recent);
+        } else {
+          renderRecent([]);
+        }
+        if ((s.total_runs || 0) === 0) {
+          status.textContent = "Start typing prompts to see insights.";
+        } else {
+          status.textContent = "Last updated: " + new Date().toLocaleTimeString();
+        }
+        status.classList.remove("err");
+      } catch (e) {
+        console.error("Dashboard load failed:", e);
+        renderSummary({
+          total_runs: 0,
+          accept_count: 0,
+          reject_count: 0,
+          review_count: 0,
+          accept_rate: 0,
+          reject_rate: 0,
+          review_rate: 0,
+          avg_ed: 0,
+          avg_sq: 0,
+          avg_clarity: 0,
+          avg_structure: 0,
+          avg_actionability: 0,
+          most_common_reason: "",
+          common_reasons: {},
+          ed_sq_series: [],
+          decision_time_buckets: [],
+        });
+        renderBars({ accept_count: 0, reject_count: 0, review_count: 0, accept_rate: 0, reject_rate: 0, review_rate: 0 });
+        renderReasons({ common_reasons: {} });
+        renderTopMistake({ most_common_reason: "", common_reasons: {} });
+        renderRecent([]);
+        updateCharts({ ed_sq_series: [], decision_time_buckets: [] });
+        status.textContent = "Could not load dashboard: " + e.message;
+        status.classList.add("err");
+      }
+    }
+
+    document.getElementById("f-range").addEventListener("change", loadDashboard);
+    document.getElementById("f-decision").addEventListener("change", loadDashboard);
+
+    loadDashboard();
+    setInterval(loadDashboard, 5000);
+  </script>
+</body>
+</html>

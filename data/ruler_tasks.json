@@ -1,0 +1,86 @@
+[
+  {
+    "id": "rul-01",
+    "context": "Sleep supports memory consolidation. Studies often compare recall after sleep versus wake.",
+    "question": "In one phrase, what does sleep support?",
+    "expected_output": "memory consolidation",
+    "type": "long_context"
+  },
+  {
+    "id": "rul-02",
+    "context": "The hippocampus helps form new memories. It interacts with cortex during consolidation.",
+    "question": "Which brain region helps form new memories?",
+    "expected_output": "hippocampus",
+    "type": "long_context"
+  },
+  {
+    "id": "rul-03",
+    "context": "Spaced practice spreads study over time. Massed practice crams sessions together.",
+    "question": "Which practice spreads study over time?",
+    "expected_output": "spaced practice",
+    "type": "long_context"
+  },
+  {
+    "id": "rul-04",
+    "context": "Aerobic exercise may support cardiovascular health. Cardiovascular health links to brain perfusion.",
+    "question": "What type of exercise is mentioned first?",
+    "expected_output": "aerobic",
+    "type": "long_context"
+  },
+  {
+    "id": "rul-05",
+    "context": "Hydration affects concentration. Even mild dehydration can reduce attention in some studies.",
+    "question": "What can mild dehydration reduce?",
+    "expected_output": "attention",
+    "type": "long_context"
+  },
+  {
+    "id": "rul-06",
+    "context": "Neuroplasticity is the brain's ability to reorganize. It occurs across the lifespan.",
+    "question": "What ability does neuroplasticity refer to?",
+    "expected_output": "reorganize",
+    "type": "long_context"
+  },
+  {
+    "id": "rul-07",
+    "context": "Blue light at night can delay melatonin onset. Melatonin helps regulate sleep timing.",
+    "question": "What can blue light at night delay?",
+    "expected_output": "melatonin",
+    "type": "long_context"
+  },
+  {
+    "id": "rul-08",
+    "context": "Working memory holds information briefly. It is limited in capacity.",
+    "question": "Working memory holds information for how long—briefly or permanently?",
+    "expected_output": "briefly",
+    "type": "long_context"
+  },
+  {
+    "id": "rul-09",
+    "context": "Social connection may reduce stress. Stress affects sleep and mood.",
+    "question": "What may social connection reduce?",
+    "expected_output": "stress",
+    "type": "long_context"
+  },
+  {
+    "id": "rul-10",
+    "context": "Omega-3 fatty acids are discussed in nutrition reviews. They are not a substitute for medical care.",
+    "question": "Which fatty acids are named?",
+    "expected_output": "omega-3",
+    "type": "long_context"
+  },
+  {
+    "id": "rul-11",
+    "context": "Caffeine is a stimulant. It can increase alertness for several hours in many people.",
+    "question": "What class of drug is caffeine?",
+    "expected_output": "stimulant",
+    "type": "long_context"
+  },
+  {
+    "id": "rul-12",
+    "context": "Mindfulness training can involve breath focus. Breath focus is one common anchor.",
+    "question": "Name one common anchor mentioned.",
+    "expected_output": "breath",
+    "type": "long_context"
+  }
+]

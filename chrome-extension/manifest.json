@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "Prompt Quality Helper",
+  "version": "1.1.0",
+  "description": "Real-time prompt quality feedback for AI chat tools (Grammarly-style).",
+
+  "permissions": ["storage"],
+
+  "host_permissions": [
+    "https://prompt-quality-analyzer.onrender.com/*"
+  ],
+
+  "background": {
+    "service_worker": "background.js"
+  },
+
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://*.chatgpt.com/*"
+      ],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Prompt Quality Helper",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

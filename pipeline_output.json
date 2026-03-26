@@ -1,0 +1,52 @@
+[
+    {
+        "prompt": "I wake up early, exercise, and work daily.",
+        "response": "I could not generate a response right now. Please try again in a moment.",
+        "decision": "reject",
+        "reason": "No clear action (e.g., explain, list, compare)",
+        "ed": 0.6469047619047619,
+        "sq": 0.7008268322063212,
+        "m1": null,
+        "m2": null
+    },
+    {
+        "prompt": "BUY NOW!!! LIMITED OFFER!!!",
+        "response": "I could not generate a response right now. Please try again in a moment.",
+        "decision": "reject",
+        "reason": "No clear action (e.g., explain, list, compare)",
+        "ed": 0.6469047619047619,
+        "sq": 0.7515464214159808,
+        "m1": null,
+        "m2": null
+    },
+    {
+        "prompt": "Photosynthesis converts sunlight into energy in plants.",
+        "response": "I could not generate a response right now. Please try again in a moment.",
+        "decision": "reject",
+        "reason": "No clear action (e.g., explain, list, compare)",
+        "ed": 0.6469047619047619,
+        "sq": 0.7169182606074289,
+        "m1": null,
+        "m2": null
+    },
+    {
+        "prompt": "Sleep improves memory because the brain consolidates information. Therefore, good sleep helps learning.",
+        "response": "I could not generate a response right now. Please try again in a moment.",
+        "decision": "reject",
+        "reason": "No clear action (e.g., explain, list, compare)",
+        "ed": 0.6469047619047619,
+        "sq": 0.6499701933158334,
+        "m1": null,
+        "m2": null
+    },
+    {
+        "prompt": "This is always true. This is never true.",
+        "response": "I could not generate a response right now. Please try again in a moment.",
+        "decision": "reject",
+        "reason": "No clear action (e.g., explain, list, compare)",
+        "ed": 0.6469047619047619,
+        "sq": 0.6545653944816283,
+        "m1": null,
+        "m2": null
+    }
+]

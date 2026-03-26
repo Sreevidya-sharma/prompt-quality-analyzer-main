@@ -1,0 +1,138 @@
+keywords:
+  - sleep
+  - memory
+  - brain
+  - health
+  - learning
+
+thresholds:
+  ed_threshold: 0.60
+  sq_threshold: 0.65
+  m2_threshold: 0.40
+
+evaluation_mode: false
+evaluation_sample_n: null
+
+drift:
+  drift_window_size: 10
+  m1_drop_threshold: 0.08
+  m2_drop_threshold: 0.08
+
+scheduler_enabled: false
+evaluation_interval_seconds: 3600
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  cors_origins:
+    - "*"
+  recent_runs_limit: 5
+  dashboard_file: "dashboard.html"
+
+storage:
+  database_url: ""
+  similarity_threshold: 0.90
+  prefix_min_shorter_len: 20
+  dedupe_recent_count: 100
+  levenshtein_cap: 1200
+
+model:
+  openai_model: "gpt-4o-mini"
+  model_version: "v1.0"
+  timeout_seconds: 45
+  max_tokens: 1024
+
+ed:
+  weight_len: 0.35
+  weight_rep: 0.30
+  weight_kw: 0.25
+  weight_sent: 0.10
+  kw_density_min: 0.05
+  kw_density_max: 0.12
+  kw_penalty_divisor: 0.12
+  token_len_ideal_min: 40
+  token_len_ideal_max: 120
+  token_len_under_scale: 40.0
+  token_len_over_scale: 120.0
+  sent_ideal_min: 2
+  sent_ideal_max: 5
+  sent_under_scale: 2.0
+  sent_over_scale: 5.0
+  spam_penalty_exclaim: 0.3
+  spam_penalty_uppercase: 0.3
+  spam_penalty_repeat_ratio: 0.3
+  spam_heavy_unique_ratio: 0.35
+  spam_heavy_penalty: 0.5
+
+sq:
+  weight_rel: 0.35
+  weight_coh: 0.25
+  weight_read: 0.20
+  weight_red: 0.10
+  weight_info_density: 0.10
+  low_info_density_threshold: 0.5
+  low_info_penalty_density: 0.2
+  min_tokens_low_info: 5
+  low_info_penalty_short: 0.3
+  coherence_floor: 0.3
+  avg_sent_len_target: 20.0
+  avg_sent_len_scale: 20.0
+  avg_word_len_target: 6.0
+  avg_word_len_scale: 4.0
+  read_sent_weight: 0.6
+  read_word_weight: 0.4
+  overlap_norm: 0.25
+
+curate:
+  min_words: 3
+  reason_too_short: "too short"
+  reason_gibberish: "Non-meaningful or random text"
+  reason_spam: "Excessive repetition or spam-like content"
+  accept_sq_gate: 0.6
+  dual_low_ed: 0.45
+  dual_low_sq: 0.45
+  intent_boost: 0.1
+  constraint_boost: 0.1
+  vague_penalty: 0.2
+  gibberish_min_word_len: 5
+  gibberish_max_vowel_ratio: 0.12
+  gibberish_repeat_char_run: 4
+
+evaluation:
+  m1:
+    weights:
+      sentence: 0.35
+      reasoning: 0.35
+      structure: 0.30
+    skip_penalty_factor: 0.7
+    reasoning_norm: 4.0
+    single_sentence_score: 0.4
+    ideal_sentences: 4
+    sentence_decay_divisor: 6.0
+    structure_two_sent: 0.4
+    structure_three_sent: 0.3
+    structure_step_weight: 0.3
+    structure_step_divisor: 2.0
+  m2:
+    weights:
+      repetition: 0.60
+      contradiction: 0.40
+    contradiction_floor: 0.2
+    min_content_token_len: 3
+    anchor_ratio_divisor: 0.3
+    overlap_weight: 0.7
+    anchor_weight: 0.3
+    duplicate_penalty_weight: 0.5
+    overlap_norm: 0.25
+    negation_words:
+      - not
+      - no
+      - never
+      - none
+      - nor
+      - neither
+      - nothing
+      - nowhere
+    pair_min_shared_tokens: 2
+    pair_jaccard_min: 0.32
+    same_sentence_always_never: true

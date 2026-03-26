@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Prompt Quality Helper</title>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        font-size: 13px;
+        margin: 12px 14px;
+        min-width: 280px;
+        color: #0f172a;
+      }
+      h1 {
+        font-size: 14px;
+        margin: 0 0 8px;
+        font-weight: 600;
+      }
+      p {
+        margin: 0 0 8px;
+        line-height: 1.45;
+        color: #475569;
+      }
+      label {
+        display: block;
+        font-size: 11px;
+        font-weight: 600;
+        color: #64748b;
+        margin-bottom: 4px;
+      }
+      input[type="text"] {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 6px 8px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 12px;
+      }
+      button {
+        margin-top: 8px;
+        padding: 6px 12px;
+        font-size: 12px;
+        border-radius: 6px;
+        border: 1px solid #cbd5e1;
+        background: #f8fafc;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #f1f5f9;
+      }
+      #saved {
+        font-size: 11px;
+        color: #16a34a;
+        margin-top: 6px;
+        min-height: 1.2em;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Prompt Quality Helper</h1>
+    <p>Type in ChatGPT, Gemini, or any site. Feedback appears bottom-right after you pause typing.</p>
+    <label for="apiBase">API base URL</label>
+    <input id="apiBase" type="text" spellcheck="false" autocomplete="off" />
+    <button type="button" id="saveApi">Save</button>
+    <p id="saved"></p>
+    <script src="popup.js"></script>
+  </body>
+</html>

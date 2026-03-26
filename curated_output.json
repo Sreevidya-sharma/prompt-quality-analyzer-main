@@ -1,0 +1,20 @@
+[
+    {
+        "text": "I wake up early, exercise, and work daily.",
+        "decision": "accept",
+        "ed": 0.42,
+        "sq": 0.9198075981720583
+    },
+    {
+        "text": "BUY NOW!!! LIMITED OFFER!!!",
+        "decision": "reject",
+        "ed": 0.2808333333333333,
+        "sq": 0.7087189066425096
+    },
+    {
+        "text": "Photosynthesis converts sunlight into energy in plants.",
+        "decision": "accept",
+        "ed": 0.41124999999999995,
+        "sq": 0.9026647410292011
+    }
+]

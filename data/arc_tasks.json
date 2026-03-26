@@ -1,0 +1,14 @@
+[
+  {"id": "arc-01", "input": "Continue the pattern: 2, 4, 8, 16, ?", "expected_output": "32", "type": "reasoning"},
+  {"id": "arc-02", "input": "If all Bloops are Razzies and all Razzies are Lazzies, are all Bloops Lazzies? Answer yes or no.", "expected_output": "yes", "type": "reasoning"},
+  {"id": "arc-03", "input": "What is 17 + 25?", "expected_output": "42", "type": "reasoning"},
+  {"id": "arc-04", "input": "Map letters to numbers A=1,B=2,... What is C + D?", "expected_output": "7", "type": "reasoning"},
+  {"id": "arc-05", "input": "Reverse the word: flow", "expected_output": "wolf", "type": "reasoning"},
+  {"id": "arc-06", "input": "Odd one out: circle, square, triangle, apple", "expected_output": "apple", "type": "reasoning"},
+  {"id": "arc-07", "input": "If x=5, what is 2x+3?", "expected_output": "13", "type": "reasoning"},
+  {"id": "arc-08", "input": "Next in sequence: A, C, E, G, ?", "expected_output": "I", "type": "reasoning"},
+  {"id": "arc-09", "input": "Boolean: NOT (true AND false)", "expected_output": "true", "type": "reasoning"},
+  {"id": "arc-10", "input": "How many vowels in 'education'?", "expected_output": "5", "type": "reasoning"},
+  {"id": "arc-11", "input": "Min of {7, 3, 9}", "expected_output": "3", "type": "reasoning"},
+  {"id": "arc-12", "input": "If train leaves at noon and takes 2 hours, arrival hour (24h) ?", "expected_output": "14", "type": "reasoning"}
+]

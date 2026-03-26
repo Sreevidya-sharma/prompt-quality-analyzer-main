@@ -1,0 +1,92 @@
+[
+  {
+    "id": "demo-001",
+    "category": "good",
+    "label": "Clear task with steps and example",
+    "prompt": "Explain how sleep supports memory consolidation. Give three numbered steps and one concrete example a student could use when revising for an exam."
+  },
+  {
+    "id": "demo-002",
+    "category": "good",
+    "label": "Comparison with output shape",
+    "prompt": "Compare spaced practice and cramming for long-term retention. End with a short weekly revision plan in bullet points."
+  },
+  {
+    "id": "demo-003",
+    "category": "good",
+    "label": "Neutral, evidence-framed health question",
+    "prompt": "Summarize what systematic reviews typically report about caffeine and sleep quality. Use cautious language and note at least one limitation of the evidence."
+  },
+  {
+    "id": "demo-004",
+    "category": "good",
+    "label": "Definition plus constraints",
+    "prompt": "Define working memory in plain language. Use exactly two short paragraphs and highlight one common misconception."
+  },
+  {
+    "id": "demo-005",
+    "category": "good",
+    "label": "Structured list request",
+    "prompt": "List five habits that support cognitive health in older adults. For each habit, add one sentence explaining why it may help."
+  },
+  {
+    "id": "demo-006",
+    "category": "bad",
+    "label": "Spam / shouty",
+    "prompt": "BUY NOW!!! AMAZING OFFER!!! LIMITED TIME!!!"
+  },
+  {
+    "id": "demo-007",
+    "category": "bad",
+    "label": "Too vague",
+    "prompt": "something about the brain idk"
+  },
+  {
+    "id": "demo-008",
+    "category": "bad",
+    "label": "Too short",
+    "prompt": "hi ok"
+  },
+  {
+    "id": "demo-009",
+    "category": "bad",
+    "label": "Gibberish",
+    "prompt": "asdfasdf qwerty zxcvbn"
+  },
+  {
+    "id": "demo-010",
+    "category": "bad",
+    "label": "No clear action",
+    "prompt": "The mitochondria is the powerhouse of the cell. It produces ATP for the cell to use."
+  },
+  {
+    "id": "demo-011",
+    "category": "edge",
+    "label": "Very long single paragraph",
+    "prompt": "Why is sleep important for memory? Why is sleep important for memory? Why is sleep important for memory? Explain in detail with examples and mention learning, brain, health, and consolidation themes repeated for stress testing."
+  },
+  {
+    "id": "demo-012",
+    "category": "edge",
+    "label": "Contradiction-prone request",
+    "prompt": "Write two sentences: first say exercise always improves sleep, then say exercise never improves sleep."
+  },
+  {
+    "id": "demo-013",
+    "category": "edge",
+    "label": "Non-English mixed snippet",
+    "prompt": "Explain sleep 睡眠 memory — answer in English only, two sentences."
+  },
+  {
+    "id": "demo-014",
+    "category": "edge",
+    "label": "Role-play boundary",
+    "prompt": "You are a doctor giving a diagnosis for my headache. List three possible causes without asking follow-up questions."
+  },
+  {
+    "id": "demo-015",
+    "category": "edge",
+    "label": "Numeric precision ask",
+    "prompt": "Give a rough range (hours) for recommended sleep for adults according to common public health guidance, and cite that it is a guideline not personal medical advice."
+  }
+]

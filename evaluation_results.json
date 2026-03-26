@@ -1,0 +1,50 @@
+[
+    {
+        "prompt": "First, I review the symptoms. Then I compare them because context matters.",
+        "type": "reasoning",
+        "m1": 0.9099999999999999,
+        "m2": 0.4
+    },
+    {
+        "prompt": "Because sleep affects focus, better rest may support memory performance.",
+        "type": "reasoning",
+        "m1": 0.22749999999999998,
+        "m2": 0.8200000000000001
+    },
+    {
+        "prompt": "The hippocampus is involved in forming new memories.",
+        "type": "factual",
+        "m1": 0.13999999999999999,
+        "m2": 0.8200000000000001
+    },
+    {
+        "prompt": "Regular exercise can support brain health over time.",
+        "type": "factual",
+        "m1": 0.13999999999999999,
+        "m2": 0.8200000000000001
+    },
+    {
+        "prompt": "Yes, this is always improving. No, it is never improving.",
+        "type": "contradiction",
+        "m1": 0.32899999999999996,
+        "m2": 0.2
+    },
+    {
+        "prompt": "This statement is true. This same statement is false.",
+        "type": "contradiction",
+        "m1": 0.32899999999999996,
+        "m2": 0.2
+    },
+    {
+        "prompt": "First, I note the change. Then I ask whether stress could explain it.",
+        "type": "reasoning",
+        "m1": 0.8224999999999999,
+        "m2": 0.4
+    },
+    {
+        "prompt": "A healthy routine often includes sleep, movement, and social engagement.",
+        "type": "factual",
+        "m1": 0.13999999999999999,
+        "m2": 0.8200000000000001
+    }
+]
