@@ -1,3 +1,5 @@
+from backend.auth.email_auth import router as auth_router
+app.include_router(auth_router, prefix="/auth", tags=["auth"])
 from __future__ import annotations
 
 from fastapi.staticfiles import StaticFiles
