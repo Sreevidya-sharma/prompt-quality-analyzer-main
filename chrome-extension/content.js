@@ -1,6 +1,12 @@
-console.log("CONTENT SCRIPT STARTED");
+const DEV_MODE = false;
+
+function log(...args) { if (DEV_MODE) console.log(...args); }
+function error(...args) { if (DEV_MODE) console.error(...args); }
+function warn(...args) { if (DEV_MODE) console.warn(...args); }
+
+log("CONTENT SCRIPT STARTED");
 chrome.runtime.sendMessage({ type: "PING" }, (res) => {
-  console.log("Ping response:", res);
+  log("Ping response:", res);
 });
 const DEBOUNCE_MS = 1000;
 const MIN_CHARS = 8;
@@ -11,19 +17,8 @@ const DEFAULT_API_BASE = BASE_URL;
 const ANALYZE_URL = `${BASE_URL}/analyze`;
 const FIXED_POPUP_TOP_PX = 20;
 const FIXED_POPUP_RIGHT_PX = 20;
-
 function getApiBase() {
-  return new Promise((resolve) => {
-    try {
-      chrome.storage.sync.get({ apiBase: DEFAULT_API_BASE }, (r) => {
-        const raw = r && r.apiBase != null ? String(r.apiBase).trim() : "";
-        const base = raw || DEFAULT_API_BASE;
-        resolve(base.replace(/\/$/, ""));
-      });
-    } catch (_) {
-      resolve(DEFAULT_API_BASE);
-    }
-  });
+  return Promise.resolve(BASE_URL);
 }
 
 let debounceTimer = null;
@@ -48,10 +43,10 @@ const editableListenerTargets = new WeakSet();
 
 function debugLog(message, details) {
   if (details === undefined) {
-    console.debug("[PromptHelper]", message);
+    log("[PromptHelper]", message);
     return;
   }
-  console.debug("[PromptHelper]", message, details);
+  log("[PromptHelper]", message, details);
 }
 
 function isEditableElement(el) {
@@ -456,7 +451,7 @@ function showResult(data) {
   setMainHtml(bodyHtml);
   applyPopupPosition();
   box.classList.add("prompt-helper-visible");
-  console.log("[PromptHelper] UI UPDATED", data);
+  log("[PromptHelper] UI UPDATED", data);
 }
 
 function showLocalModeWithReason(reason, details) {
@@ -538,7 +533,7 @@ async function runAnalyze(text, opts = {}) {
     const requestId = `req-${Date.now()}-${++analyzeRequestSeq}`;
     lastSentNorm = norm;
     lastSentAtMs = Date.now();
-    console.log("[PromptHelper] SENDING:", text);
+    log("[PromptHelper] SENDING:", text);
     debugLog("Outgoing message to background", {
       requestId,
       type: "ANALYZE",
@@ -613,7 +608,7 @@ function sendForAnalysis(text, source = "submit") {
   const raw = typeof text === "string" ? text : "";
   const trimmed = raw.trim();
   if (!trimmed || trimmed.length < 3) return;
-  console.log("[FINAL SENT]", trimmed);
+  log("[FINAL SENT]", trimmed);
   runAnalyze(trimmed, { force: true, source });
 }
 
@@ -632,11 +627,11 @@ function handleTyping(sourceEl = null, trigger = "unknown") {
     const norm = normalizePrompt(text);
     observeEditableTextChanges(el);
     const textLength = text.length;
-    console.log("[TRIGGER SOURCE]", trigger);
-    console.log("[TEXT NOW]", text);
-    console.log("[NORMALIZED]", norm);
-    console.log("[PromptHelper] CURRENT TEXT:", text);
-    console.log("[PromptHelper] LAST SENT:", lastSentNorm);
+    log("[TRIGGER SOURCE]", trigger);
+    log("[TEXT NOW]", text);
+    log("[NORMALIZED]", norm);
+    log("[PromptHelper] CURRENT TEXT:", text);
+    log("[PromptHelper] LAST SENT:", lastSentNorm);
     debugLog("Input detected", { trigger, length: textLength });
 
     if (!text || text.trim().length === 0) {
@@ -674,11 +669,11 @@ function handleTyping(sourceEl = null, trigger = "unknown") {
       const norm2 = normalizePrompt(text2);
       observeEditableTextChanges(el2);
       const text2Length = text2.length;
-      console.log("[TRIGGER SOURCE]", trigger);
-      console.log("[TEXT NOW]", text2);
-      console.log("[NORMALIZED]", norm2);
-      console.log("[PromptHelper] CURRENT TEXT:", text2);
-      console.log("[PromptHelper] LAST SENT:", lastSentNorm);
+      log("[TRIGGER SOURCE]", trigger);
+      log("[TEXT NOW]", text2);
+      log("[NORMALIZED]", norm2);
+      log("[PromptHelper] CURRENT TEXT:", text2);
+      log("[PromptHelper] LAST SENT:", lastSentNorm);
 
       if (!text2 || text2.trim().length === 0) {
         removePopup();
@@ -704,7 +699,7 @@ function handleTyping(sourceEl = null, trigger = "unknown") {
       }
 
       if (shouldSkipEvaluation(text2)) {
-        console.log("[PromptHelper] SKIPPED:", text2);
+        log("[PromptHelper] SKIPPED:", text2);
         setLoading(false);
         setMainHtml(
           '<span class="prompt-helper-pending">Unchanged duplicate (2s cooldown).</span>',
@@ -743,7 +738,7 @@ function onGlobalInput(e) {
   const el = target.closest('[contenteditable="true"], textarea');
   if (!el) return;
   const text = getInputText(el);
-  console.log("[FORCE INPUT EVENT]", text);
+  log("[FORCE INPUT EVENT]", text);
   activeEditableEl = el;
   handleTyping(el, "input");
 }
@@ -753,7 +748,7 @@ function onGlobalKeydown(e) {
   const el = getCurrentEditable() || document.querySelector('[contenteditable="true"], textarea');
   if (!el) return;
   const text = getInputText(el);
-  console.log("[SUBMIT DETECTED]", text);
+  log("[SUBMIT DETECTED]", text);
   sendForAnalysis(text, "submit_enter");
 }
 
@@ -765,7 +760,7 @@ function onGlobalClick(e) {
   const el = getCurrentEditable() || document.querySelector('[contenteditable="true"], textarea');
   if (!el) return;
   const text = getInputText(el);
-  console.log("[CLICK SUBMIT]", text);
+  log("[CLICK SUBMIT]", text);
   sendForAnalysis(text, "submit_click");
 }
 

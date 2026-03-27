@@ -3,11 +3,22 @@ importScripts("user-id.js");
 const BASE_URL = "https://prompt-quality-analyzer.onrender.com";
 const API_URL = `${BASE_URL}/analyze`;
 const API_TIMEOUT_MS = 30000;
+const DEV_MODE = false;
 
-console.log("🔥 Background script loaded");
+function log(...args) {
+  if (DEV_MODE) console.log(...args);
+}
+function error(...args) {
+  if (DEV_MODE) console.error(...args);
+}
+function warn(...args) {
+  if (DEV_MODE) console.warn(...args);
+}
+
+log("Background script loaded");
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  console.log("📩 [BG] Message received:", msg);
+  log("[BG] Message received:", msg);
 
   if (msg.type === "PING") {
     sendResponse({ ok: true });
@@ -22,8 +33,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       return;
     }
 
-    console.log("🚀 CALLING API:", API_URL);
-    console.log("🧠 PROMPT:", prompt);
+    log("Calling API:", API_URL);
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
@@ -36,37 +46,36 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "x-user-id": userId,
+            "x-user-id": userId
           },
           body: JSON.stringify({ text: prompt }),
-          signal: controller.signal,
+          signal: controller.signal
         });
 
         clearTimeout(timeoutId);
 
-        console.log("📡 STATUS:", res.status);
+        log("Status:", res.status);
 
         const raw = await res.text();
-        console.log("📦 RAW RESPONSE:", raw);
+        log("Raw response:", raw);
 
         let data = null;
         try {
           data = raw ? JSON.parse(raw) : null;
         } catch (e) {
-          console.error("❌ JSON PARSE ERROR:", e);
+          error("JSON parse error:", e);
           sendResponse(fallback("Invalid JSON from API"));
           return;
         }
 
         if (!res.ok || !data) {
-          console.error("❌ API ERROR:", data || raw);
+          error("API error:", data || raw);
           sendResponse(fallback("API error"));
           return;
         }
 
-        // ✅ CRITICAL FIX: ensure decision always exists
         if (!data.decision) {
-          console.warn("⚠️ Missing decision → fixing");
+          warn("Missing decision → fixing");
 
           data = {
             decision: "review",
@@ -81,12 +90,12 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
           };
         }
 
-        console.log("✅ FINAL DATA:", data);
+        log("Final data:", data);
         sendResponse(data);
 
       } catch (err) {
         clearTimeout(timeoutId);
-        console.error("❌ FETCH FAILED:", err);
+        error("Fetch failed:", err);
         sendResponse(fallback("Network error"));
       }
     })();

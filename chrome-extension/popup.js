@@ -1,11 +1,4 @@
-const DEFAULT_API_BASE = "https://prompt-quality-analyzer.onrender.com";
-
-function getApiBaseSync(callback) {
-  chrome.storage.sync.get({ apiBase: DEFAULT_API_BASE }, (sync) => {
-    const base = (sync.apiBase && String(sync.apiBase).trim()) || DEFAULT_API_BASE;
-    callback(base.replace(/\/$/, ""));
-  });
-}
+const API_BASE = "https://prompt-quality-analyzer.onrender.com";
 
 function updateAuthUI() {
   const authForm = document.getElementById("auth-form");
@@ -19,16 +12,12 @@ function updateAuthUI() {
       authForm.hidden = true;
       userInfo.hidden = false;
       userInfo.textContent = u.email;
-      if (authStatus) {
-        authStatus.style.color = "#16a34a";
-      }
+      if (authStatus) authStatus.style.color = "#16a34a";
     } else {
       authForm.hidden = false;
       userInfo.textContent = "";
       userInfo.hidden = true;
-      if (authStatus) {
-        authStatus.style.color = "#b91c1c";
-      }
+      if (authStatus) authStatus.style.color = "#b91c1c";
     }
   });
 }
@@ -42,66 +31,55 @@ function parseErrorResponse(res) {
         const data = JSON.parse(raw);
         if (data && typeof data.detail === "string") return data.detail;
         return `HTTP ${res.status}: ${raw}`;
-      } catch (_err) {
+      } catch {
         return `HTTP ${res.status}: ${raw}`;
       }
     })
     .catch(() => `HTTP ${res.status}`);
 }
 
-function authFlow(path, email, password, authStatus, updateAuthUI) {
-  getApiBaseSync((baseClean) => {
-    fetch(baseClean + path, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-    })
-      .then((res) => {
-        if (!res.ok) {
-          return parseErrorResponse(res).then((msg) => {
-            throw new Error(msg);
-          });
-        }
-        return res.json();
-      })
-      .then((data) => {
-        const user = data;
-        chrome.storage.local.set({ user: data, email: user.email }, () => {
-          updateAuthUI();
-          authStatus.style.color = "#16a34a";
-          authStatus.textContent =
-            path === "/auth/register" ? "Registered and signed in." : "Signed in.";
-          setTimeout(() => {
-            authStatus.textContent = "";
-          }, 2500);
+function authFlow(path, email, password, authStatus) {
+  fetch(API_BASE + path, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ email, password })
+  })
+    .then((res) => {
+      if (!res.ok) {
+        return parseErrorResponse(res).then((msg) => {
+          throw new Error(msg);
         });
-      })
-      .catch((e) => {
-        authStatus.style.color = "#b91c1c";
-        authStatus.textContent = e.message || String(e);
-        console.error(e);
+      }
+      return res.json();
+    })
+    .then((data) => {
+      chrome.storage.local.set({ user: data, email: data.email }, () => {
+        updateAuthUI();
+        authStatus.style.color = "#16a34a";
+        authStatus.textContent =
+          path === "/auth/register" ? "Registered and signed in." : "Signed in.";
+        setTimeout(() => {
+          authStatus.textContent = "";
+        }, 2500);
       });
-  });
+    })
+    .catch((e) => {
+      authStatus.style.color = "#b91c1c";
+      authStatus.textContent = e.message || String(e);
+    });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  const input = document.getElementById("apiBase");
-  const btn = document.getElementById("saveApi");
   const loginBtn = document.getElementById("login-btn");
   const registerBtn = document.getElementById("register-btn");
   const emailInput = document.getElementById("email");
   const passwordInput = document.getElementById("password");
   const authStatus = document.getElementById("auth-status");
   const openDashboard = document.getElementById("openDashboard");
-  const saved = document.getElementById("saved");
 
   updateAuthUI();
-
-  chrome.storage.sync.get({ apiBase: DEFAULT_API_BASE }, (r) => {
-    input.value = (r.apiBase && String(r.apiBase).trim()) || DEFAULT_API_BASE;
-  });
 
   loginBtn.addEventListener("click", () => {
     authStatus.textContent = "";
@@ -112,7 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
       authStatus.textContent = "Enter email and password.";
       return;
     }
-    authFlow("/auth/login", email, password, authStatus, updateAuthUI);
+    authFlow("/auth/login", email, password, authStatus);
   });
 
   registerBtn.addEventListener("click", () => {
@@ -124,29 +102,13 @@ document.addEventListener("DOMContentLoaded", () => {
       authStatus.textContent = "Enter email and password.";
       return;
     }
-    authFlow("/auth/register", email, password, authStatus, updateAuthUI);
+    authFlow("/auth/register", email, password, authStatus);
   });
 
-  openDashboard.addEventListener("click", () => {
-    getApiBaseSync((baseClean) => {
-      (async () => {
-        const userId = await getUserId();
-        chrome.tabs.create({
-          url: `${baseClean}/dashboard?user_id=${encodeURIComponent(userId)}`,
-        });
-      })();
-    });
-  });
-
-  btn.addEventListener("click", () => {
-    let v = input.value.trim().replace(/\/$/, "");
-    if (!v) v = DEFAULT_API_BASE;
-    chrome.storage.sync.set({ apiBase: v }, () => {
-      input.value = v;
-      saved.textContent = "Saved.";
-      setTimeout(() => {
-        saved.textContent = "";
-      }, 2000);
+  openDashboard.addEventListener("click", async () => {
+    const userId = await getUserId();
+    chrome.tabs.create({
+      url: `${API_BASE}/dashboard?user_id=${encodeURIComponent(userId)}`
     });
   });
 });
