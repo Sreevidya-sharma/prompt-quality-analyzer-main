@@ -74,14 +74,6 @@ STATIC_DIR = Path(__file__).resolve().parent.parent.parent / "public"
 print("STATIC DIR:", STATIC_DIR)
 print("EXISTS:", STATIC_DIR.exists())
 
-if STATIC_DIR.exists():
-    app.mount(
-        "/static",
-        StaticFiles(directory=str(STATIC_DIR)),
-        name="static",
-    )
-else:
-    print("STATIC DIR NOT FOUND:", STATIC_DIR)
 
 app.add_middleware(
     CORSMiddleware,
