@@ -1,6 +1,7 @@
-# Prompt Cognitive Health Pipeline
+# Prompt Quality Helper
 
-A system that evaluates user prompts (and model responses) for clarity and quality, scores them with **ED**, **SQ**, **M1**, and **M2**, and surfaces feedback in a browser extension and web dashboard.
+Prompt Quality Helper is a production-ready Chrome Extension that evaluates prompt quality in real time and provides actionable feedback directly on supported AI chat platforms.  
+It is powered by a deployed FastAPI backend and shared scoring pipeline, with analytics surfaced in a web dashboard.
 
 ## Problem Statement
 
@@ -8,10 +9,10 @@ Large language models respond to whatever users type. Vague, spam-like, or unstr
 
 ## Solution Overview
 
-This project ties together four pieces:
+This project ties together four pieces, with the extension as the primary user interface:
 
-1. **Chrome extension** – Sends the current prompt to a local API and shows pass/fail-style feedback (decision, scores, reason, suggestion).
-2. **FastAPI service** – One **`run_pipeline`** path: model inference → curation (**ED** / **SQ**) → **M1** / **M2** when accepted → optional SQLite logging.
+1. **Chrome extension** – Captures prompts on supported AI sites and shows real-time overlay feedback.
+2. **FastAPI service (deployed)** – One **`run_pipeline`** path: model inference → curation (**ED** / **SQ**) → **M1** / **M2** when accepted → SQLite logging.
 3. **SQLite storage** – Persists runs for analytics.
 4. **Dashboard** – Filters, charts, and recent runs over stored data.
 
@@ -19,11 +20,14 @@ The same pipeline logic runs everywhere (API and scripts), so behavior stays con
 
 ## Features
 
-- Real-time extension overlay on common chat UIs (debounced analyze calls).
+- Real-time prompt feedback overlay on supported AI chat interfaces.
+- **Accept / Reject / Review** decision for each analyzed prompt.
+- Clarity, Structure, and Actionability scoring for every prompt.
+- Improved prompt suggestions to help users refine inputs before submitting.
+- **Dashboard analytics** with live stats, filters, trend charts, and recent runs.
+- Privacy-focused operation: runs only on supported AI sites.
 - **Unified pipeline**: infer → `curate_text` (on model response) → M2 gate → metrics.
-- **Dashboard**: time range and decision filters, Chart.js trends, M1/M2 in summaries.
 - **Tests**: `pytest` for scoring, evaluation, and API (`tests/`).
-- **Configurable** YAML (`configs/base.yaml`) for thresholds, keywords, and model settings.
 
 ## Architecture
 
@@ -31,25 +35,30 @@ High-level data flow:
 
 ![Architecture](docs/architecture.png)
 
-1. **User input** is captured in the page.  
-2. The **extension** POSTs `{ "text": "..." }` to **`/analyze`**.  
-3. **FastAPI** calls **`run_pipeline`**.  
-4. **Scoring** computes **ED** and **SQ** via `curate_text`.  
-5. **Evaluation** computes **M1** and **M2** on accepted responses (before M2 threshold enforcement).  
-6. Results are stored in **SQLite** and visible in the **dashboard** (`/dashboard`).
+1. The **extension** captures prompt text on supported sites.  
+2. It sends `{ "text": "..." }` to the deployed API: `https://prompt-quality-analyzer.onrender.com/analyze`.  
+3. **FastAPI** runs **`run_pipeline`** to score and evaluate prompt quality.  
+4. Results flow to **SQLite** and are surfaced in the **dashboard** (`/dashboard`).
 
 More detail: [docs/metrics.md](docs/metrics.md), [docs/comparison.md](docs/comparison.md).
+
+## Extension Details
+
+- The **content script** detects and captures prompt input from supported AI chat pages.
+- The **background service worker** sends analysis requests to the backend API.
+- The **overlay UI** renders decision, scores, reason, and prompt-improvement suggestions in real time.
 
 ## Tech Stack
 
 | Layer        | Technology                          |
 |-------------|--------------------------------------|
-| API         | FastAPI, Uvicorn                     |
+| Extension   | Chrome Extension (Manifest V3), JavaScript (content + background scripts) |
+| API         | FastAPI (deployed), Uvicorn          |
+| Deployment  | Render                               |
 | Pipeline    | Python 3, shared `pipeline.py`       |
 | Scoring     | scikit-learn (TF–IDF), custom rules  |
 | Storage     | SQLite (`storage.py`)                |
 | Dashboard   | Static HTML + Chart.js               |
-| Extension   | Manifest V3, content script + popup  |
 | Tests       | pytest, FastAPI `TestClient`        |
 | Config      | PyYAML                               |
 
@@ -73,7 +82,7 @@ pip install -r requirements.txt
 
 1. Open `chrome://extensions`, enable **Developer mode**.
 2. **Load unpacked** → select the **`chrome-extension`** folder.
-3. In the extension popup, set **API base URL** (default `https://prompt-quality-analyzer.onrender.com`).
+3. In the extension popup, confirm the **API base URL** is set to `https://prompt-quality-analyzer.onrender.com`.
 
 ## How to Run
 
@@ -90,7 +99,7 @@ uvicorn api_server:app --reload --host 0.0.0.0 --port 8000
 
 ### Extension
 
-With the API running, open a supported chat page, type a prompt, pause briefly—the overlay shows the latest analysis.
+Open a supported AI chat page, type a prompt, and pause briefly. The extension overlay will show the latest decision, scores, and suggestion.
 
 ### Tests
 
@@ -126,10 +135,9 @@ Runs one sample through `run_pipeline` with `persist=False`.
 
 ## Future Improvements
 
-- User accounts and cloud-hosted API.
 - Per-domain extension UX presets; richer accessibility.
 - Calibration studies for ED/SQ vs human ratings.
-- Export dashboard reports (PDF/CSV) for coursework evidence.
+- Export dashboard reports (PDF/CSV).
 
 ## Project layout
 
@@ -142,6 +150,41 @@ chrome-extension/
 src/            # scoring & evaluation modules
 ```
 
-## License / academic use
+## License / usage
 
-Suitable for coursework demonstration and viva; cite or adapt with attribution per your institution’s rules.
+Use and adapt with attribution according to your organization’s requirements.
+
+## Privacy Policy
+
+Privacy Policy for Prompt Quality Helper
+
+Effective Date: March 27, 2026
+
+This extension is designed to improve prompt quality on supported AI platforms while respecting user privacy.
+
+Data Collection:
+- Email address (used for user identification and dashboard access)
+- User prompts (processed temporarily for analysis)
+
+Data Usage:
+- Prompts are sent securely to a backend API for analysis
+- Email is used to associate activity with a dashboard
+- No prompt data is permanently stored
+
+Data Storage:
+- Email may be stored securely
+- Prompt data is NOT stored locally or permanently
+
+Data Sharing:
+- No user data is sold or shared with third parties
+
+Security:
+- All communication is over HTTPS
+- Backend APIs are secured
+
+User Control:
+- Users can stop using the extension anytime
+- No tracking outside supported sites
+
+Contact:
+vidyasreethotapalli@gmail.com
