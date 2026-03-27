@@ -43,7 +43,7 @@ async def lifespan(app: FastAPI):
         format="%(asctime)s %(levelname)s %(message)s",
         datefmt="%Y-%m-%dT%H:%M:%S",
     )
-    logger.info("Static directory configured: %s (exists=%s)", _STATIC_DIR, Path(_STATIC_DIR).is_dir())
+    logger.info("Static directory configured: %s (exists=%s)", STATIC_DIR, STATIC_DIR.is_dir())
     try:
         init_db(CONFIG)
     except Exception:
@@ -69,11 +69,15 @@ def _api_section() -> dict[str, Any]:
 app = FastAPI(lifespan=lifespan)
 _api = _api_section()
 
-STATIC_DIR = Path(__file__).resolve().parent.parent.parent / "public"
+STATIC_DIR = Path(__file__).resolve().parents[2] / "public" / "static"
 
 print("STATIC DIR:", STATIC_DIR)
-print("EXISTS:", STATIC_DIR.exists())
 
+app.mount(
+    "/static",
+    StaticFiles(directory=str(STATIC_DIR)),
+    name="static",
+)
 
 app.add_middleware(
     CORSMiddleware,
