@@ -1,48 +1,67 @@
 # Privacy Policy for Prompt Quality Helper
 
-Effective Date: March 27, 2026
+Effective Date: April 1, 2026
 
 ## Overview
 
-This extension is designed to improve prompt quality on supported AI platforms while respecting user privacy.
-
-The extension provides real-time prompt analysis features that require sending user-entered prompt text to a backend service. By using the extension, users acknowledge that their input will be processed as described in this policy.
+Prompt Quality Helper analyzes user-entered prompts on supported AI websites to provide real-time feedback. The extension only operates on supported AI platforms and does not access unrelated browsing data.
 
 ## Data We Collect
 
-- Email address (used for user identification and dashboard access)
-- User prompts collected from the active input field on supported AI websites for analysis and feedback
+* User-entered prompt text from active input fields on supported AI websites
+* Email address (only if provided for dashboard or identification purposes)
 
-The extension only accesses text from the currently active input field on supported AI websites. It does not access unrelated page content, browsing history, or other data outside of the prompt input.
+## Data We Do NOT Collect
 
-## Data Usage
+* Browsing history
+* Cookies
+* Keystrokes outside supported prompt fields
+* Personal files or system data
 
-- Prompts are sent securely to a backend API for analysis
-- Email is used to associate activity with a dashboard
-- Prompt analysis data is used for analytics and dashboard features
+## How Data is Used
+
+* Prompt text is sent to a backend API for analysis and feedback generation
+* Email is used only for associating data with a dashboard session
+* Data is used strictly for functionality, analytics, and improving prompt evaluation
 
 ## Data Storage
 
-- Email may be stored securely for authentication and account association
-- Prompt data is processed and stored securely for analysis and dashboard features
+* Data is processed and stored on secure backend servers
+* Storage is limited to what is necessary for analytics and functionality
+* Data may be stored in databases such as SQLite for dashboard features
 
-Prompt data is retained for analytics and functionality purposes and may be stored until it is no longer needed for operational or analytical use. Future versions may include user-controlled data deletion options.
+## Data Retention
+
+* Prompt data is retained only as long as necessary for functionality and analytics
+* Users may request deletion of their data by contacting the email below
 
 ## Data Sharing
 
-- No user data is sold or shared with third parties
-- Data is not shared with external third-party services for marketing, advertising, or user profiling purposes.
+* No user data is sold or shared with third parties
+* Data is not used for advertising, marketing, or profiling
+
+## Third-Party Services
+
+* Backend hosting may use services such as Render
+* AI processing may use external APIs (if applicable)
+* These services process data only to provide core functionality
+
+## Permissions Justification
+
+* activeTab: to read prompt input fields on supported AI websites
+* scripting/content scripts: to display feedback overlay
+* No permissions are used to access unrelated websites or user data
 
 ## Security
 
-- All communication is over HTTPS
-- Backend APIs are secured
+* All data transmission is encrypted using HTTPS
+* Backend systems are secured to prevent unauthorized access
 
 ## User Control
 
-- Users can stop using the extension anytime
-- No tracking outside supported sites
+* Users can stop using the extension at any time
+* Users can request data deletion via contact email
 
 ## Contact
 
-vidyasreethotapalli@gmail.com
+[vidyasreethotapalli@gmail.com](mailto:vidyasreethotapalli@gmail.com)

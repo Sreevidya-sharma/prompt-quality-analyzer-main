@@ -25,7 +25,7 @@ The same pipeline logic runs everywhere (API and scripts), so behavior stays con
 - Clarity, Structure, and Actionability scoring for every prompt.
 - Improved prompt suggestions to help users refine inputs before submitting.
 - **Dashboard analytics** with live stats, filters, trend charts, and recent runs.
-- Privacy-focused operation: runs only on supported AI sites.
+- cy-focused operation: runs only on supported AI sites.
 - **Unified pipeline**: infer → `curate_text` (on model response) → M2 gate → metrics.
 - **Tests**: `pytest` for scoring, evaluation, and API (`tests/`).
 
@@ -163,13 +163,13 @@ src/            # scoring & evaluation modules
 
 Use and adapt with attribution according to your organization’s requirements.
 
-## Privacy Policy
+## cy Policy
 
-Privacy Policy for Prompt Quality Helper
+cy Policy for Prompt Quality Helper
 
 Effective Date: March 27, 2026
 
-This extension is designed to improve prompt quality on supported AI platforms while respecting user privacy.
+This extension is designed to improve prompt quality on supported AI platforms while respecting user cy.
 
 The extension provides real-time prompt analysis features that require sending user-entered prompt text to a backend service. By using the extension, users acknowledge that their input will be processed as described in this policy.
 
